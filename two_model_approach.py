@@ -36,23 +36,23 @@ def send_results_to_llm(json_results, initial_prompt, db_scheme, generated_query
     return summary_response
     
 def get_schema_with_samples():
-    # veritabanındaki tabloların isimlerini ve her tablonun sütunlarını (ve örnek verileri) alır
-    schema_with_samples = {} # boş sözlük
-    # SQLite veritabanındaki tüm tabloların isimlerini almak için bir SQL sorgusu çalıştırır
+  
+    schema_with_samples = {} 
+   
     tables = c.execute("SELECT name FROM sqlite_master WHERE type='table';").fetchall()
-    for table in tables: # her table için teker teker
-        table_name = table[0] # önce table adı 
-        columns = c.execute(f"PRAGMA table_info({table_name});").fetchall() # tablonun kolonları
-        schema = {col[1]: col[2] for col in columns}  # {column_name: data_type} # şema bağlantısı
-        # sözlükte her anahtar sütun adı (col[1]), her değer ise ilgili veri türüdür (col[2])
+    for table in tables: 
+        table_name = table[0] 
+        columns = c.execute(f"PRAGMA table_info({table_name});").fetchall() 
+        schema = {col[1]: col[2] for col in columns} 
+        
         
       
-        samples = c.execute(f"SELECT * FROM {table_name} LIMIT 3;").fetchall() # her birinden üçer örnek al
-        sample_data = [] # örnek data boş
-        for row in samples: # samples içindeki her bir satırı sample dataya koy
+        samples = c.execute(f"SELECT * FROM {table_name} LIMIT 3;").fetchall()
+        sample_data = []
+        for row in samples: 
             sample_data.append(dict(zip(schema.keys(), row)))
         
-        # tüm db yi table namelerin altındaki columnlara ve sample örneklere structurluyor
+       
         schema_with_samples[table_name] = { 
             "columns": schema,
             "examples": sample_data
@@ -144,7 +144,7 @@ def chatbot(user_input):
     if "SELECT" in sql_query_string:
         sql_query_string = sql_query_string.replace("SELECT", "SELECT DISTINCT", 1)
 
-    # db ye gönderme
+    
     try:
         c.execute(sql_query_string)
         result = c.fetchall()
